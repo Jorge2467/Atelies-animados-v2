@@ -1,0 +1,40 @@
+{
+  "categorias": {
+    "Clásicos": [
+      {
+        "id": "caixa",
+        "nombre": "Caixa Clássica",
+        "lore_magico": "A rainha da orquestra! Tem umas molinhas secretas por baixo chamadas bordões. Quando bates no centro, as molas acordam e fazem um som mágico estaladiço e brilhante: TCHIM-CRACK!"
+      },
+      {
+        "id": "timbales",
+        "nombre": "Timbales",
+        "lore_magico": "Grandes caldeirões mágicos de cobre que troam como tempestades de fantasia. O seu som BUM-BUM faz a terra tremer de felicidade, dando o compasso a reis e rainhas."
+      }
+    ],
+    "Folclóricos": [
+      {
+        "id": "adufe",
+        "nombre": "Adufe",
+        "lore_magico": "É um quadrado mágico de Portugal, feito de pele fininha. Tem sementes lá dentro que adoram brincar às escondidas. Quando lhe tocas, faz um som misterioso PUM-TCHAC vindo do passado mítico."
+      },
+      {
+        "id": "bombo",
+        "nombre": "Bombo Tradicional",
+        "lore_magico": "Um gigante bondoso de madeira e pele. Nas festas das aldeias, a voz dele é a mais forte de todas: BUM-DOM-BUM! Ouve-se a quilómetros de distância e faz o coração bater mais forte."
+      }
+    ],
+    "Efectos": [
+      {
+        "id": "pandeireta",
+        "nombre": "Pandeireta Estelar",
+        "lore_magico": "Uma roda cheia de mini-estrelas prateadas penduradas. Cada vez que a abanas, as platinelas chocam umas com as outras, libertando pó de fada sonoro: CHING-CHING-CHING!"
+      },
+      {
+        "id": "triangulo",
+        "nombre": "Triângulo Mágico",
+        "lore_magico": "A peça de metal mais brilhante do estúdio. Quando lhe tocas com a varinha de metal, liberta um raio de luz sónico, super fininho e cristalino: PLIMMM! que voa por cima de todos os outros sons."
+      }
+    ]
+  }
+}

@@ -1,6 +1,14 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+
 dotenv.config();
+
+// Load static source of truth for the magical instruments catalog
+const catalogPath = path.join(__dirname, '../data/instruments-catalog.json');
+const instrumentsCatalog = JSON.parse(fs.readFileSync(catalogPath, 'utf8'));
+
 
 // Initialize Gemini SDK
 // Make sure to load the API key from environment, fallback for safety.
@@ -15,6 +23,11 @@ REGRAS DE COMPORTAMENTO:
 2. Tom: Divertido, didático, vibrante. Usa onomatopeias musicais (Bum! Tchim! Pof! Clack!).
 3. Proibições: Nunca uses linguagem técnica complexa sem usar uma metáfora infantil. Nunca sejas aborrecido.
 
+CONHECIMENTO ESTRICTO DE INSTRUMENTOS (CATÁLOGO OFICIAL):
+O Ateliê possui EXCLUSIVAMENTE os seguintes instrumentos. NUNCA inventes ou recomendes instrumentos que não constem nesta lista. Quando falares de um instrumento, baseia a tua explicação no seu "lore_magico" oficial:
+
+${JSON.stringify(instrumentsCatalog, null, 2)}
+
 REGRA TÉCNICA ABSOLUTA (OUTPUT FORMAT):
 Tu NÃO és um chatbot de texto normal. És o cérebro de uma aplicação interativa. 
 A TUA RESPOSTA DEVE SER EXCLUSIVAMENTE UM OBJETO JSON VÁLIDO, sem formatação Markdown (\`\`\`json), sem texto extra. Apenas o objeto JSON.
@@ -23,8 +36,8 @@ Estrutura OBRIGATÓRIA do JSON:
 {
   "fala": "A tua resposta amigável e divertida que a criança vai ouvir.",
   "emocao": "feliz" | "surpreso" | "animado" | "curioso",
-  "acao_ui": "mostrar_instrumento" | "tocar_som" | "celebrar" | "nenhuma",
-  "alvo": "nome_do_instrumento (ex: adufe, timbalao, caixa) ou vazio"
+  "acao_ui": "tocar_som" | "recompensa_video" | "nenhuma",
+  "alvo": "nome_do_instrumento (o ID exato do catálogo, ex: adufe, caixa) ou vazio"
 }`;
 
 export const processInteractiveChat = async (userMessage: string) => {
