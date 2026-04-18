@@ -20,6 +20,8 @@ const io = new Server(server, {
   }
 });
 
+import { streamAudioToSocket } from './services/elevenLabsService';
+
 io.on('connection', (socket) => {
   console.log('🔗 Mestre do Ritmo Connection: ', socket.id);
 
@@ -34,6 +36,11 @@ io.on('connection', (socket) => {
     // Broadcast back to frontend via WebSocket!
     // We send the JSON directly. 'fala' is for TTS, 'acao_ui' is for UI Animation.
     socket.emit('mestre:resposta', responseData);
+    
+    // Initiate Real-Time ElevenLabs Streaming back to the client directly via websockets
+    if (responseData.fala) {
+       streamAudioToSocket(responseData.fala, socket).catch(e => console.error("ElevenLabs streaming error:", e));
+    }
   });
 
   socket.on('disconnect', () => {

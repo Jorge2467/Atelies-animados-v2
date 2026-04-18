@@ -46,6 +46,56 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       set({ latestResponse: data, isThinking: false });
     });
 
+    let audioContext: AudioContext;
+    let audioQueue: ArrayBuffer[] = [];
+    let isPlaying = false;
+    let nextTime = 0;
+
+    const playNextInQueue = async () => {
+      if (audioQueue.length === 0 || !audioContext) {
+        isPlaying = false;
+        return;
+      }
+
+      isPlaying = true;
+      const arrayBuffer = audioQueue.shift()!;
+      
+      try {
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        const source = audioContext.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(audioContext.destination);
+
+        const currentTime = audioContext.currentTime;
+        if (nextTime < currentTime) nextTime = currentTime;
+
+        source.start(nextTime);
+        nextTime += audioBuffer.duration;
+
+        source.onended = () => {
+          if (audioQueue.length === 0) {
+             isPlaying = false;
+             nextTime = 0;
+          } else {
+             playNextInQueue();
+          }
+        };
+      } catch (err) {
+        console.error("Audio decode error:", err);
+        playNextInQueue();
+      }
+    };
+
+    newSocket.on('mestre:resposta_audio', (arrayBuffer: ArrayBuffer) => {
+      if (!audioContext) audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      
+      // Push chunk into the queue
+      audioQueue.push(arrayBuffer);
+      if (!isPlaying) {
+        playNextInQueue();
+      }
+    });
+
     set({ socket: newSocket });
   },
 
