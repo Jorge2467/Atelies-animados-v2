@@ -1,4 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Initialize Gemini SDK
 // Make sure to load the API key from environment, fallback for safety.
