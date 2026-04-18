@@ -9,7 +9,7 @@ const INSTRUMENTOS = [
 ];
 
 export function InstrumentGrid() {
-  const { latestResponse, resetAction } = useSocketStore();
+  const { latestResponse, resetAction, isThinking } = useSocketStore();
   const [active, setActive] = useState<string | null>(null);
 
   // Controls for programmatic animation triggered by Gemini
@@ -48,18 +48,29 @@ export function InstrumentGrid() {
   }, [latestResponse, controlsTimbales, controlsAdufe, controlsCaixa, resetAction]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-10">
-      {INSTRUMENTOS.map((inst) => (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-10 relative">
+      {INSTRUMENTOS.map((inst, index) => (
         <motion.div
           key={inst.id}
-          animate={getControls(inst.id)}
+          animate={isThinking ? {
+            boxShadow: ["0 0 0px rgba(0,0,0,0)", `0 0 40px ${inst.id === 'timbales' ? '#00F0FF' : inst.id === 'adufe' ? '#FF0055' : '#FFE600'}`, "0 0 0px rgba(0,0,0,0)"],
+            transition: { duration: 1.5, repeat: Infinity, delay: index * 0.3 }
+          } : getControls(inst.id)}
           whileHover={{ scale: 1.05, y: -10 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setActive(inst.id)}
-          className={`group glass-panel rounded-3xl p-8 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 ${active === inst.id ? 'ring-2 shadow-[0_0_20px_rgba(0,240,255,0.5)]' : ''} ${inst.color}`}
+          className={`group glass-panel rounded-3xl p-8 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 ${active === inst.id ? 'ring-2 shadow-[0_0_20px_rgba(0,240,255,0.5)]' : ''} ${inst.color} ${isThinking ? 'border-white/40' : ''}`}
         >
-          <div className="w-32 h-32 rounded-full mb-6 bg-white/10 flex items-center justify-center overflow-hidden">
-             <img src={`/images/${inst.id}.png`} alt={inst.nombre} className="opacity-80 group-hover:opacity-100 transition-opacity" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+          <div className="w-32 h-32 rounded-full mb-6 bg-white/10 flex items-center justify-center overflow-hidden relative">
+             {/* Magic 'Thinking' Eye Glow Effect */}
+             {isThinking && (
+               <motion.div 
+                 animate={{ opacity: [0.2, 0.8, 0.2] }} 
+                 transition={{ duration: 1, repeat: Infinity, delay: index * 0.2 }}
+                 className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent z-10"
+               />
+             )}
+             <img src={`/images/${inst.id}.png`} alt={inst.nombre} className="opacity-80 group-hover:opacity-100 transition-opacity z-0" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
           </div>
           <h3 className="text-2xl font-bold font-sans text-white mb-4 group-hover:text-white/90">{inst.nombre}</h3>
           

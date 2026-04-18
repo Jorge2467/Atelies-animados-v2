@@ -83,10 +83,15 @@ function App() {
               className="mb-6 pointer-events-auto max-w-2xl text-center glass-panel p-6 rounded-3xl border-neon-yellow/30"
             >
               {isThinking ? (
-                <div className="flex gap-2 justify-center items-center h-8">
-                   <span className="w-3 h-3 bg-neon-fuchsia rounded-full animate-bounce"></span>
-                   <span className="w-3 h-3 bg-neon-blue rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></span>
-                   <span className="w-3 h-3 bg-neon-yellow rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                <div className="flex flex-col items-center justify-center gap-3">
+                   <motion.div 
+                      animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                      className="w-16 h-1 rounded-full bg-gradient-to-r from-neon-blue via-neon-fuchsia to-neon-yellow shadow-[0_0_15px_rgba(255,0,85,0.8)]"
+                   />
+                   <p className="text-white/80 font-bold uppercase tracking-[0.2em] text-sm animate-pulse">
+                      Magia Sonora a Crescer...
+                   </p>
                 </div>
               ) : (
                 <p className="text-2xl font-bold text-white tracking-wide">
