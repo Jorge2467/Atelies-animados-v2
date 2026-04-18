@@ -53,15 +53,6 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     newSocket.on('mestre:resposta', (data: MestreResponse) => {
       console.log("Recebido do Mestre:", data);
       set({ latestResponse: data, isThinking: false });
-
-      // Use Local Genérico Web Speech API para no depender de ElevenLabs ahora
-      if (data.fala && window.speechSynthesis) {
-        const utterance = new SpeechSynthesisUtterance(data.fala);
-        utterance.lang = 'pt-PT'; // Femenina nativa de Portugal por defecto
-        utterance.pitch = 1.3;    // Para hacerla sonar infantil/animada
-        utterance.rate = 1.1;     // Ritmo dinámico
-        window.speechSynthesis.speak(utterance);
-      }
     });
 
     let audioContext: AudioContext;

@@ -102,9 +102,9 @@ io.on('connection', (socket) => {
     socket.emit('mestre:resposta', responseData);
     
     // Initiate Real-Time ElevenLabs Streaming back to the client directly via websockets
-    // if (responseData.fala) {
-    //    streamAudioToSocket(responseData.fala, socket).catch(e => console.error("ElevenLabs streaming error:", e));
-    // }
+    if (responseData.fala) {
+       streamAudioToSocket(responseData.fala, socket).catch(e => console.error("ElevenLabs streaming error:", e));
+    }
   });
 
   socket.on('disconnect', () => {
