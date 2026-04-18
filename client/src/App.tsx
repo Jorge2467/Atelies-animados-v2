@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { InstrumentGrid } from './components/InstrumentGrid';
 import { CharacterLab } from './components/CharacterLab';
+import { TheaterPlayer } from './components/TheaterPlayer';
 import { useSocketStore } from './store/useSocketStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Wifi, WifiOff, Mic } from 'lucide-react';
@@ -45,6 +46,9 @@ function App() {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Dopamine Reward System */}
+      <TheaterPlayer />
 
       {/* Main Content Container */}
       <main className="relative z-10 flex flex-col min-h-screen items-center justify-start pt-24 pb-32 px-4 md:px-8 max-w-7xl mx-auto space-y-12">

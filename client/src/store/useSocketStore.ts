@@ -12,17 +12,20 @@ interface SocketState {
   socket: Socket | null;
   isConnected: boolean;
   isThinking: boolean;
+  isRewardActive: boolean;
   latestResponse: MestreResponse | null;
   connect: () => void;
   disconnect: () => void;
   sendMessage: (texto: string) => void;
   resetAction: () => void;
+  setRewardState: (state: boolean) => void;
 }
 
 export const useSocketStore = create<SocketState>((set, get) => ({
   socket: null,
   isConnected: false,
   isThinking: false,
+  isRewardActive: false,
   latestResponse: null,
 
   connect: () => {
@@ -120,5 +123,9 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     set((state) => ({
       latestResponse: state.latestResponse ? { ...state.latestResponse, acao_ui: 'nenhuma', alvo: '' } : null
     }));
+  },
+
+  setRewardState: (state: boolean) => {
+    set({ isRewardActive: state });
   }
 }));
