@@ -6,7 +6,7 @@ services:
       context: ./client
     container_name: percussao-client
     ports:
-      - "3000:80"
+      - "3005:80"
     restart: unless-stopped
     networks:
       - percussao_network
