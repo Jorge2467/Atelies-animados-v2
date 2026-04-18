@@ -1,4 +1,4 @@
-import express from 'react'; // wait, oops, should be express from 'express', fixing in code
+import express, { Request, Response } from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
@@ -30,7 +30,7 @@ const prisma = new PrismaClient();
 app.use(express.json());
 
 // Auth Route para el login tipo Netflix Kids
-app.post('/api/auth/kid', async (req, res) => {
+app.post('/api/auth/kid', async (req: Request, res: Response): Promise<any> => {
   try {
     const { codigo_vinculo } = req.body;
     
