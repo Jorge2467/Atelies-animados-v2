@@ -22,13 +22,66 @@ const io = new Server(server, {
 
 import { streamAudioToSocket } from './services/elevenLabsService';
 import { logInteracao } from './services/dbService';
+import { PrismaClient } from '@prisma/client';
 
-// Variables simuladas para la fase de desarrollo (Luego vendrán del User Auth/Login)
-const MOCK_ALUMNO_ID = "00000000-0000-0000-0000-000000000001";
-const MOCK_SESSAO_ID = "00000000-0000-0000-0000-000000000002";
+const prisma = new PrismaClient();
+
+// Habilitar parseo de JSON para Express REST API
+app.use(express.json());
+
+// Auth Route para el login tipo Netflix Kids
+app.post('/api/auth/kid', async (req, res) => {
+  try {
+    const { codigo_vinculo } = req.body;
+    
+    if (!codigo_vinculo) {
+      return res.status(400).json({ error: "PIN (codigo_vinculo) ausente." });
+    }
+
+    const alumno = await prisma.alumno.findFirst({
+      where: { codigo_vinculo }
+    });
+
+    if (!alumno) {
+      return res.status(401).json({ error: "Código PIN incorrecto ou Aluno não encontrado." });
+    }
+
+    // Login exitoso: Creamos una nueva sesión
+    const sessao = await prisma.sessao.create({
+      data: {
+        alumnoId: alumno.id,
+      }
+    });
+
+    res.json({
+      alumno: {
+        id: alumno.id,
+        nome: alumno.nome,
+        idade: alumno.idade
+      },
+      sessaoId: sessao.id
+    });
+  } catch (err) {
+    console.error("Auth Error:", err);
+    res.status(500).json({ error: "Erro interno no servidor." });
+  }
+});
+
+// Remove simulated IDs as we will now receive them from the socket auth proxy
+// We will intercept the real IDs connecting to the tunnel
 
 io.on('connection', (socket) => {
-  console.log('🔗 Mestre do Ritmo Connection: ', socket.id);
+  // Extract identity from socket handshake
+  const alumnoId = socket.handshake.auth?.alumnoId as string;
+  const sessaoId = socket.handshake.auth?.sessaoId as string;
+
+  if (!alumnoId || !sessaoId) {
+    console.warn(`⚠️ Intento de conexión anónima o defectuosa rechazada: ${socket.id}`);
+    socket.disconnect(true);
+    return;
+  }
+
+  console.log(`🔗 Mestre do Ritmo Connection: ${socket.id} | Alumno: ${alumnoId} | Sessao: ${sessaoId}`);
 
   socket.on('mestre:mensagem', async (data: { texto: string }) => {
     console.log('🎤 Received input:', data.texto);
@@ -40,7 +93,7 @@ io.on('connection', (socket) => {
     
     // Fire-and-forget Data Logging for the Business Metrics
     if (responseData.acao_ui) {
-      logInteracao(MOCK_ALUMNO_ID, MOCK_SESSAO_ID, responseData.acao_ui, responseData.alvo)
+      logInteracao(alumnoId, sessaoId, responseData.acao_ui, responseData.alvo)
         .catch((err) => console.error("[PRISMA ERROR] Fallo al guardar interacción silenciosa:", err.message));
     }
 

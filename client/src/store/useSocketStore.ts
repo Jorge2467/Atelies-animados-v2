@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { io, Socket } from 'socket.io-client';
+import { useAuthStore } from './useAuthStore';
 
 interface MestreResponse {
   fala: string;
@@ -30,8 +31,12 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
   connect: () => {
     if (get().socket) return;
+    
+    // Retrieve Auth Credentials dynamically
+    const { alumno, sessaoId } = useAuthStore.getState();
 
     const newSocket = io('http://localhost:3006', {
+      auth: { alumnoId: alumno?.id, sessaoId },
       reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,
     });

@@ -3,17 +3,22 @@ import { InstrumentGrid } from './components/InstrumentGrid';
 import { CharacterLab } from './components/CharacterLab';
 import { TheaterPlayer } from './components/TheaterPlayer';
 import { useSocketStore } from './store/useSocketStore';
+import { useAuthStore } from './store/useAuthStore';
+import { LoginKidView } from './views/LoginKidView';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Wifi, WifiOff, Mic } from 'lucide-react';
 
 function App() {
   const { connect, disconnect, isConnected, isThinking, latestResponse, sendMessage } = useSocketStore();
+  const { alumno } = useAuthStore();
   const [inputText, setInputText] = useState("");
 
   useEffect(() => {
-    connect();
+    if (alumno) {
+       connect();
+    }
     return () => disconnect();
-  }, [connect, disconnect]);
+  }, [connect, disconnect, alumno]);
 
   const handleSend = () => {
     if (inputText.trim()) {
@@ -21,6 +26,10 @@ function App() {
       setInputText("");
     }
   };
+
+  if (!alumno) {
+    return <LoginKidView />;
+  }
 
   return (
     <div className="min-h-screen bg-obsidian text-slate-100 font-sans selection:bg-neon-fuchsia/30 selection:text-white relative">
