@@ -18,4 +18,4 @@ RUN npx prisma generate
 RUN npm run build
 
 # Start Command ensuring migrations run before app boot
-CMD ["sh", "-c", "npx prisma db push && node prisma/seed.js && node dist/server.js"]
+CMD ["sh", "-c", "npx prisma db push && node dist/prisma/seed.js && node dist/src/server.js"]
