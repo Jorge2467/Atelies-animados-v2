@@ -67,6 +67,22 @@ app.post('/api/auth/kid', async (req: Request, res: Response): Promise<any> => {
   }
 });
 
+import { gerarPersonagemPixar } from './services/visionService';
+
+app.post('/api/laboratorio/gerar', async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { ideia } = req.body;
+    if (!ideia) {
+      return res.status(400).json({ error: "A ideia é obrigatória!" });
+    }
+    const url = await gerarPersonagemPixar(ideia);
+    res.json({ url });
+  } catch (err) {
+    console.error("Erro na API geradora:", err);
+    res.status(500).json({ error: "Falha na geração mágica" });
+  }
+});
+
 // Remove simulated IDs as we will now receive them from the socket auth proxy
 // We will intercept the real IDs connecting to the tunnel
 

@@ -1,95 +1,72 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Wand2 } from 'lucide-react';
 
 export function CharacterLab() {
-  const [loading, setLoading] = useState(false);
-  const [character, setCharacter] = useState<string | null>(null);
+  const [ideia, setIdeia] = useState('');
+  const [imagemUrl, setImagemUrl] = useState<string | null>(null);
+  const [carregando, setCarregando] = useState(false);
 
-  const [prompt, setPrompt] = useState('');
+  const criarPersonagem = async () => {
+    if (!ideia) return;
+    setCarregando(true);
+    setImagemUrl(null);
 
-  const generateMagic = () => {
-    if (!prompt.trim()) return;
-    setLoading(true);
-    // Simulate generation latency slightly
-    setTimeout(() => {
-      const encoded = encodeURIComponent(`cute pixar style musical instrument ${prompt} dark background`);
-      setCharacter(`https://image.pollinations.ai/prompt/${encoded}?nologo=true&seed=${Math.floor(Math.random() * 100000)}`);
-      setLoading(false);
-    }, 1500);
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'https://vapi.v2.aulasonlinepercussao.com';
+      const response = await fetch(`${API_URL}/api/laboratorio/gerar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ideia })
+      });
+      const data = await response.json();
+      setImagemUrl(data.url);
+    } catch (error) {
+      console.error("Error al generar", error);
+    } finally {
+      setCarregando(false);
+    }
   };
-
+  
   return (
-    <div className="glass-panel p-10 rounded-[2rem] w-full max-w-4xl mx-auto flex flex-col md:flex-row gap-10 mt-10">
+    <div className="p-8 bg-[#0A0A0C] flex flex-col items-center rounded-[2rem] w-full max-w-4xl mx-auto mt-10 shadow-2xl border border-white/5">
+      <h1 className="text-4xl text-white font-bold mb-8">Ateliê de Invenções ✨</h1>
       
-      {/* Visualizer Area */}
-      <div className="flex-1 border border-white/5 bg-black/20 rounded-[1.5rem] overflow-hidden relative aspect-square flex items-center justify-center">
-        <AnimatePresence mode="popLayout">
-          {loading ? (
-            <motion.div 
-              key="loading"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 flex flex-col items-center justify-center"
-            >
-              {/* Brilliant Skeleton Loader */}
-              <motion.div 
-                animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
-                className="w-32 h-32 rounded-full border-4 border-t-neon-fuchsia border-r-neon-blue border-b-neon-yellow border-l-transparent"
-              />
-              <p className="mt-6 text-white/70 font-semibold tracking-wider uppercase text-sm animate-pulse">
-                Criando Magia...
-              </p>
-            </motion.div>
-          ) : character ? (
-            <motion.img 
-              key="result"
-              initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: "spring", stiffness: 100 }}
-              src={character} 
-              alt="Personagem Criado" 
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <motion.div 
-              key="empty"
-              className="text-center text-white/30 p-10"
-            >
-              <Wand2 className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <p className="text-xl">O estúdio está vazio</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Control Area */}
-      <div className="flex-1 flex flex-col justify-center space-y-8">
-        <div>
-          <h2 className="text-3xl font-extrabold text-white mb-2">Laboratório</h2>
-          <p className="text-white/60 text-lg leading-relaxed">
-            Escreve a tua ideia e a inteligência irá desenhar um novo amigo musical estilo Pixar.
-          </p>
-        </div>
-        
-        <textarea 
-          placeholder="Ex: Um tambor de lata muito animado..."
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          className="w-full bg-black/30 border border-white/10 rounded-2xl p-6 text-white text-lg focus:outline-none focus:ring-2 focus:ring-neon-fuchsia/50 focus:border-neon-fuchsia/50 transition-all resize-none h-32 placeholder:text-white/20"
+      <div className="flex gap-4 w-full max-w-2xl mb-12 flex-col md:flex-row">
+        <input 
+          className="flex-1 bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-xl backdrop-blur-md focus:border-[#00F0FF] outline-none transition-all"
+          placeholder="Ex: Um bombo com pernas de aranha..."
+          value={ideia}
+          onChange={(e) => setIdeia(e.target.value)}
         />
-
-        <motion.button 
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={generateMagic}
-          className="w-full py-5 rounded-2xl bg-gradient-to-r from-neon-fuchsia to-neon-blue text-white font-bold text-xl shadow-[0_0_30px_rgba(255,0,85,0.4)] flex items-center justify-center gap-3 relative overflow-hidden group"
+        <button 
+          onClick={criarPersonagem}
+          className="bg-gradient-to-r from-[#00F0FF] to-[#0055FF] text-white font-bold text-xl px-8 py-4 rounded-2xl hover:scale-105 transition-transform"
         >
-          <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-          <Sparkles className="w-6 h-6" />
-          <span>Criar Personagem</span>
-        </motion.button>
+          Criar! 🪄
+        </button>
       </div>
 
+      <AnimatePresence>
+        {carregando && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="text-[#00F0FF] text-2xl font-bold animate-pulse text-center w-full my-10"
+          >
+            A misturar tintas mágicas... 🎨
+          </motion.div>
+        )}
+
+        {imagemUrl && !carregando && (
+          <motion.img 
+            initial={{ scale: 0.5, opacity: 0, y: 50 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 200, damping: 15 }}
+            src={imagemUrl} 
+            alt="Personagem Gerado" 
+            className="w-full max-w-2xl rounded-3xl shadow-[0_0_50px_rgba(0,240,255,0.3)] border border-white/10"
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
