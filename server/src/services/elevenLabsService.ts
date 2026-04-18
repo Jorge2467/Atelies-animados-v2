@@ -4,8 +4,8 @@ dotenv.config();
 
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || '';
 
-// A high energy voice suitable for animation/gaming ("Callum", "Charlie", or an energetic custom profile. We use a known standard one: 'pNInz6obbfdqIeCQzv0m' or 'JBFqnCBcs6QImihOSt97' but since the exact ID isn't mandated, we pick one of the core lively voices: Adam 'pNInz6obbfdqIeCQzv0m' or standard lively male like Charlie 'IKne3meq5aSn9XLyUdCD'). Let's use Charlie.
-const MESTRE_VOICE_ID = 'IKne3meq5aSn9XLyUdCD'; 
+// Using 'Rachel' (21m00Tcm4TlvDq8ikWAM) - a highly popular female voice that adapts beautifully to strict European Portuguese in multilingual_v2 without the heavy Brazilian twang
+const MESTRE_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; 
 
 export const streamAudioToSocket = async (text: string, socket: Socket) => {
   if (!ELEVENLABS_API_KEY) {
