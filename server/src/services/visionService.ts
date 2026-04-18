@@ -1,4 +1,4 @@
-import { fal } from "@fal-ai/serverless-client";
+import { fal } from "@fal-ai/client";
 
 export async function gerarPersonagemPixar(ideiaCrianca: string) {
   try {
@@ -12,9 +12,9 @@ export async function gerarPersonagemPixar(ideiaCrianca: string) {
         image_size: "landscape_4_3",
         num_inference_steps: 4 // Velocidad extrema
       },
-    });
+    }) as any;
 
-    return result.images[0].url; // Devuelve la URL real de la imagen generada
+    return result.data.images[0].url; // Devuelve la URL real de la imagen generada
   } catch (error) {
     console.error("Erro no Laboratório de Imagens:", error);
     throw new Error("O forno mágico quebrou!");
