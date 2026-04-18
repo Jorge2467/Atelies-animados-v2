@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  client:
+    build:
+      context: ./client
+    container_name: percussao-client
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    networks:
+      - percussao_network
+
+  server:
+    build:
+      context: ./server
+    container_name: percussao-server
+    ports:
+      # Explicitly mapping what the socket.io runs on
+      - "3006:3006"
+    env_file:
+      - ./server/.env
+    restart: unless-stopped
+    networks:
+      - percussao_network
+
+networks:
+  percussao_network:
+    driver: bridge
