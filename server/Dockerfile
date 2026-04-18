@@ -16,6 +16,7 @@ COPY . .
 # Local databases shouldn't be copied from host; we init them via run script
 RUN npx prisma generate
 RUN npm run build
+RUN cp -r src/data dist/src/
 
 # Start Command ensuring migrations run before app boot
 CMD ["sh", "-c", "npx prisma db push && node dist/prisma/seed.js && node dist/src/server.js"]
