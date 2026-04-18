@@ -1,13 +1,45 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// server/prisma/schema.prisma
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
+  url      = env("DATABASE_URL") // file:./dev.db
+}
+
+model Alumno {
+  id             String        @id @default(uuid())
+  nome           String
+  idade          Int
+  codigo_vinculo String?       // Código familiar/profesor para reportería B2B
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  Sessoes        Sessao[]
+  Interacoes     Interacao[]
+}
+
+model Sessao {
+  id         String    @id @default(uuid())
+  alumnoId   String
+  inicio     DateTime  @default(now())
+  fim        DateTime? 
+  duracaoSeg Int?      // Métrica de Time-To-Retention pura
+  
+  alumno     Alumno    @relation(fields: [alumnoId], references: [id], onDelete: Cascade)
+  Interacoes Interacao[]
+}
+
+model Interacao {
+  id         String   @id @default(uuid())
+  alumnoId   String
+  sessaoId   String   // Add missing column
+  alvo       String   // Ej: "adufe", "caixa" (Qué retiene su atención)
+  acao_ui    String   // Ej: "tocar_som", "recompensa_video"
+  timestamp  DateTime @default(now())
+
+  alumno     Alumno   @relation(fields: [alumnoId], references: [id], onDelete: Cascade)
+  sessao     Sessao   @relation(fields: [sessaoId], references: [id], onDelete: Cascade)
 }
