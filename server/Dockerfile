@@ -7,7 +7,7 @@ RUN apk add --no-cache openssl
 
 # Package files
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 # Source files
 COPY . .
