@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { InstrumentGrid } from './components/InstrumentGrid';
 import { CharacterLab } from './components/CharacterLab';
 import { TheaterPlayer } from './components/TheaterPlayer';
