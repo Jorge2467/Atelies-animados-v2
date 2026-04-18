@@ -44,7 +44,7 @@ export const processInteractiveChat = async (userMessage: string) => {
   try {
     // Force generation configuration to output schema-compliant JSON 
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash", // Represents our stable multimodal AI wrapper for 3.1
+      model: "gemini-2.0-flash", // Represents our stable multimodal AI wrapper for 3.1
       systemInstruction: {
         role: "system",
         parts: [{ text: SYSTEM_INSTRUCTION }]
