@@ -74,7 +74,14 @@ export function InstrumentGrid() {
           </div>
           <h3 className="text-2xl font-bold font-sans text-white mb-4 group-hover:text-white/90">{inst.nombre}</h3>
           
-          <button className="px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors border border-white/10 backdrop-blur-md text-white font-semibold">
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              const message = `Podes ensinar-me um ritmo super divertido de ${inst.nombre}?`;
+              useSocketStore.getState().sendMessage(message);
+            }}
+            className="px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors border border-white/10 backdrop-blur-md text-white font-semibold flex gap-2 items-center"
+          >
             Tocar Ritmo
           </button>
         </motion.div>

@@ -13,11 +13,11 @@ export const streamAudioToSocket = async (text: string, socket: Socket) => {
     return;
   }
 
-  const url = `https://api.elevenlabs.io/v1/text-to-speech/${MESTRE_VOICE_ID}/stream?optimize_streaming_latency=3`;
-
   try {
-    console.log(`[ElevenLabs] Iniciando conexión de stream para fala...`);
+    console.log(`[ElevenLabs] Iniciando petición de audio al servidor TTS...`);
     const t0 = Date.now();
+    const url = `https://api.elevenlabs.io/v1/text-to-speech/${MESTRE_VOICE_ID}?optimize_streaming_latency=0`;
+    
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -29,9 +29,9 @@ export const streamAudioToSocket = async (text: string, socket: Socket) => {
         text: text,
         model_id: "eleven_multilingual_v2",
         voice_settings: {
-          stability: 0.35, // Bajo para emociones fluctuantes
+          stability: 0.35,
           similarity_boost: 0.5,
-          style: 0.70, // Alta exageración de estilo (Pixar/Disney)
+          style: 0.70,
           use_speaker_boost: true
         }
       })
@@ -43,29 +43,12 @@ export const streamAudioToSocket = async (text: string, socket: Socket) => {
       return;
     }
 
-    if (response.body) {
-      const reader = response.body.getReader();
-      let firstChunk = true;
-
-      while (true) {
-        const { done, value } = await reader.read();
-        
-        if (firstChunk && value) {
-           console.log(`[ElevenLabs] ⏳ TTFB (Time To First Byte de Audio): ${Date.now() - t0}ms`);
-           firstChunk = false;
-        }
-
-        if (done) {
-          // Emitir un evento de fin de audio si es necesario para el frontend
-          socket.emit('mestre:audio_end');
-          console.log(`[ElevenLabs] ✅ Stream completado exitosamente.`);
-          break;
-        }
-
-        // Enviamos el chunk crudo (Uint8Array) mediante WebSocket (Socket.io lo maneja bien y llega como ArrayBuffer)
-        socket.emit('mestre:resposta_audio', value);
-      }
-    }
+    const arrayBuffer = await response.arrayBuffer();
+    console.log(`[ElevenLabs] ✅ Audio generado completo en ${Date.now() - t0}ms. Tamaño: ${arrayBuffer.byteLength} bytes.`);
+    
+    // Emit the complete pristine buffer to guarantee ZERO UI stutters
+    socket.emit('mestre:resposta_audio', Buffer.from(arrayBuffer));
+    socket.emit('mestre:audio_end');
   } catch (error) {
     console.error("[ElevenLabs] Ha ocurrido un error en el streaming de audio:", error);
   }

@@ -6,13 +6,17 @@ export function CharacterLab() {
   const [loading, setLoading] = useState(false);
   const [character, setCharacter] = useState<string | null>(null);
 
+  const [prompt, setPrompt] = useState('');
+
   const generateMagic = () => {
+    if (!prompt.trim()) return;
     setLoading(true);
-    // Simulate generation latency
+    // Simulate generation latency slightly
     setTimeout(() => {
-      setCharacter('https://image.pollinations.ai/prompt/cute%20pixar%20style%20musical%20instrument%20character%20timbales%20dark%20background?nologo=true');
+      const encoded = encodeURIComponent(`cute pixar style musical instrument ${prompt} dark background`);
+      setCharacter(`https://image.pollinations.ai/prompt/${encoded}?nologo=true&seed=${Math.floor(Math.random() * 100000)}`);
       setLoading(false);
-    }, 2000);
+    }, 1500);
   };
 
   return (
@@ -69,6 +73,8 @@ export function CharacterLab() {
         
         <textarea 
           placeholder="Ex: Um tambor de lata muito animado..."
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
           className="w-full bg-black/30 border border-white/10 rounded-2xl p-6 text-white text-lg focus:outline-none focus:ring-2 focus:ring-neon-fuchsia/50 focus:border-neon-fuchsia/50 transition-all resize-none h-32 placeholder:text-white/20"
         />
 

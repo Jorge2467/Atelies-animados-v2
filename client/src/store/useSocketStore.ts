@@ -56,52 +56,21 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     });
 
     let audioContext: AudioContext;
-    let audioQueue: ArrayBuffer[] = [];
-    let isPlaying = false;
-    let nextTime = 0;
 
-    const playNextInQueue = async () => {
-      if (audioQueue.length === 0 || !audioContext) {
-        isPlaying = false;
-        return;
-      }
-
-      isPlaying = true;
-      const arrayBuffer = audioQueue.shift()!;
+    newSocket.on('mestre:resposta_audio', async (arrayBuffer: ArrayBuffer) => {
+      if (!audioContext) audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       
       try {
+        // Decode the single, holistic payload
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
         const source = audioContext.createBufferSource();
         source.buffer = audioBuffer;
         source.connect(audioContext.destination);
-
-        const currentTime = audioContext.currentTime;
-        if (nextTime < currentTime) nextTime = currentTime;
-
-        source.start(nextTime);
-        nextTime += audioBuffer.duration;
-
-        source.onended = () => {
-          if (audioQueue.length === 0) {
-             isPlaying = false;
-             nextTime = 0;
-          } else {
-             playNextInQueue();
-          }
-        };
+        
+        // Play immediately bridging the gap perfectly
+        source.start(0);
       } catch (err) {
-        console.error("Audio decode error:", err);
-        playNextInQueue();
-      }
-    };
-
-    newSocket.on('mestre:resposta_audio', (arrayBuffer: ArrayBuffer) => {
-      if (!audioContext) audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      
-      // Push chunk into the queue
-      audioQueue.push(arrayBuffer);
-      if (!isPlaying) {
-        playNextInQueue();
+        console.error("Audio holistic decode error:", err);
       }
     });
 
