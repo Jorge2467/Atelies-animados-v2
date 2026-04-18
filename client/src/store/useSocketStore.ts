@@ -1,0 +1,74 @@
+import { create } from 'zustand';
+import { io, Socket } from 'socket.io-client';
+
+interface MestreResponse {
+  fala: string;
+  emocao: string;
+  acao_ui: string;
+  alvo: string;
+}
+
+interface SocketState {
+  socket: Socket | null;
+  isConnected: boolean;
+  isThinking: boolean;
+  latestResponse: MestreResponse | null;
+  connect: () => void;
+  disconnect: () => void;
+  sendMessage: (texto: string) => void;
+  resetAction: () => void;
+}
+
+export const useSocketStore = create<SocketState>((set, get) => ({
+  socket: null,
+  isConnected: false,
+  isThinking: false,
+  latestResponse: null,
+
+  connect: () => {
+    if (get().socket) return;
+
+    const newSocket = io('http://localhost:3006', {
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+    });
+
+    newSocket.on('connect', () => {
+      set({ isConnected: true, socket: newSocket });
+    });
+
+    newSocket.on('disconnect', () => {
+      set({ isConnected: false });
+    });
+
+    newSocket.on('mestre:resposta', (data: MestreResponse) => {
+      console.log("Recebido do Mestre:", data);
+      set({ latestResponse: data, isThinking: false });
+    });
+
+    set({ socket: newSocket });
+  },
+
+  disconnect: () => {
+    const { socket } = get();
+    if (socket) {
+      socket.disconnect();
+      set({ socket: null, isConnected: false, isThinking: false });
+    }
+  },
+
+  sendMessage: (texto: string) => {
+    const { socket } = get();
+    if (socket && socket.connected) {
+      set({ isThinking: true, latestResponse: null });
+      socket.emit('mestre:mensagem', { texto });
+    }
+  },
+
+  resetAction: () => {
+    // Allows clearing the animation trigger after it fired
+    set((state) => ({
+      latestResponse: state.latestResponse ? { ...state.latestResponse, acao_ui: 'nenhuma', alvo: '' } : null
+    }));
+  }
+}));
