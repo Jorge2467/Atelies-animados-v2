@@ -13,7 +13,8 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   login: async (pin: string) => {
     try {
-      const response = await fetch('/api/auth/kid', {
+      const API_URL = import.meta.env.VITE_API_URL || 'https://vapi.v2.aulasonlinepercussao.com';
+      const response = await fetch(`${API_URL}/api/auth/kid`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ codigo_vinculo: pin })

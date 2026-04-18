@@ -34,8 +34,9 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     
     // Retrieve Auth Credentials dynamically
     const { alumno, sessaoId } = useAuthStore.getState();
+    const API_URL = import.meta.env.VITE_API_URL || 'https://vapi.v2.aulasonlinepercussao.com';
 
-    const newSocket = io('http://localhost:3006', {
+    const newSocket = io(API_URL, {
       auth: { alumnoId: alumno?.id, sessaoId },
       reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,
